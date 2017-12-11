@@ -1,7 +1,7 @@
 from claptcha import Claptcha
 
 # Initialize Claptcha object with "Text" as text and FreeMono as font
-c = Claptcha("Text", "/Library/Fonts/AppleGothic.ttf")
+c = Claptcha("A", "/Library/Fonts/AppleGothic.ttf")
 
 # Get PIL Image object
 text, image = c.image
@@ -17,7 +17,7 @@ print(text)         # 'Text'
 print(type(bytes))  # <class '_io.BytesIO'>
 
 # Save a PNG file 'test.png'
-text, file = c.write('test.png')
+text, file = c.write(text +'.png')
 
 print(text)         # 'Text'
 print(file)         # 'test.png'
