@@ -1,23 +1,21 @@
 from claptcha import Claptcha
 
-# Initialize Claptcha object with "Text" as text and FreeMono as font
-c = Claptcha("A", "/Library/Fonts/AppleGothic.ttf")
+font = "/Library/Fonts/AppleGothic.ttf"
+path = "./images/"
 
-# Get PIL Image object
-text, image = c.image
+for j in range(0, 10):
+    for i in range(0, 100):
+        c = Claptcha(str(j), font);
+        c.size = (100, 100)
+        c.margin = (5,5);
+        text, image = c.image
+        text, bytes = c.bytes
+        fileName = str(j) + "_"
+        if i < 10:
+            fileName = fileName + "00" + str(i)
+        else:
+            fileName = fileName + "0" + str(i)
+        fileName = fileName + ".bmp"
 
-print(text)        # 'Text'
-print(type(image))  # <class 'PIL.Image.Image'>
-
-# Get BytesIO object (note that it will represent a different image, just
-# with the same text)
-text, bytes = c.bytes
-
-print(text)         # 'Text'
-print(type(bytes))  # <class '_io.BytesIO'>
-
-# Save a PNG file 'test.png'
-text, file = c.write(text +'.png')
-
-print(text)         # 'Text'
-print(file)         # 'test.png'
+        print(fileName)
+        c.write(path + fileName)
