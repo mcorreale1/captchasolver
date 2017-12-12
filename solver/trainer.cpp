@@ -10,10 +10,14 @@
 #include <limits>
 #include <algorithm>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 using namespace cv;
 
+#define IMAGE_WIDTH  100
+#define IMAGE_HEIGHT  100
+#define VECTOR_SIZE  10000
 enum Classes {ZERO = 0, ONE = 1, TWO = 2, THREE = 3, FOUR = 4, 
                 FIVE = 5, SIX = 6, SEVEN = 7, EIGHT = 8, NINE = 9,
                 A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z};
@@ -24,16 +28,50 @@ struct ImageData {
 
 Mat applyOperator(Mat &img, vector<vector<int> > &kernel, int mode);
 void generateData(string in, string out);
+void generateTraining(char* dataIn, char* out);
 Mat generateImage(string path);
+float sigmoid(float z);
 void showImage(string name, Mat& img);
-
 int main(int argc, char **argv) {
-    //int size = atoi(argv[2]); 
-    //Mat test = generateImage(argv[1]);
-    //showImage("Test", test);
-    //waitKey();
-    generateData(argv[1], argv[2]);
-    Classes c = (Classes) 2;
+    //generateData(argv[1], argv[2]);
+    generateTraining(argv[1], argv[2]);
+}
+
+void generateTraining(char* dataIn, char* out) {
+    ifstream input(dataIn);
+    ifstream output(out);
+    vector<ImageData> data;
+    string line;
+    int sizeIndex = 0;
+    while(getline(input, line)) {
+        ImageData id;
+        int count = 0;
+        char cl = (char)line[0];
+        Classes dataClass = (Classes)(((int)cl) - 48);
+        id.c = dataClass;
+        stringstream ss(line.substr(2));
+
+        char delim;
+        int v;
+        ss >> v;
+        id.pixels.push_back((uchar) v);
+        while(ss >> delim >> v && delim == ',') {
+            id.pixels.push_back((uchar) v);
+        }
+        Mat img(cv::Size(IMAGE_WIDTH,IMAGE_HEIGHT), 0);
+        for(int x = 0; x < img.rows; ++x) {
+            for(int y = 0; y < img.cols; ++y) {
+                img.at<uchar>(x,y) = (uchar)id.pixels[x*(IMAGE_WIDTH) + y];
+            }
+        }
+        showImage("TEST", img);
+        waitKey();
+        sizeIndex++;
+        data.push_back(id);
+    }   
+
+
+        
 }
 
 Mat generateImage(string path) {
@@ -42,7 +80,7 @@ Mat generateImage(string path) {
     cvtColor(img_raw, img, CV_BGR2GRAY);
     for(int x = 0; x < img.rows; ++x) {
         for(int y = 0; y < img.cols; ++y) {
-            if(img.at<uchar>(x,y) <= 100) {
+            if(img.at<uchar>(x,y) <= 175) {
                 img.at<uchar>(x,y) = 0;
             } else {
                 img.at<uchar>(x,y) = 255;
@@ -50,12 +88,18 @@ Mat generateImage(string path) {
         }
     }
     vector<vector<int> > kernel = {
-        {0,1,0},
         {1,1,1},
-        {0,1,0}};
+        {1,1,1},
+        {1,1,1}};
+    vector<vector<int> > kernel2 = {
+        {0,1,1,1,0},
+        {1,1,1,1,1},
+        {1,1,1,1,1},
+        {1,1,1,1,1},
+        {0,1,1,1,0}};
 
-    img = applyOperator(img, kernel, 0);
-    img = applyOperator(img, kernel, 1);
+    img = applyOperator(img, kernel2, 0);
+    img = applyOperator(img, kernel2, 1);
     return img;
 }
 
@@ -76,22 +120,41 @@ void generateData(string in, string out) {
             string file = in + std::to_string(imgClass) + "_" + imgNumber + ".bmp";
             std::cout << file << std::endl;
             Mat img = generateImage(file);
-            //vector<uchar> pixels;
+            vector<uchar> pixels;
             output << imgClass << ":";            
             string values = "";
-            for(int x = 0; x < img.rows; ++x) {
-                for(int y = 0; y < img.cols; ++y) {
+            for(int x = 0; x < img.cols; ++x) {
+                for(int y = 0; y < img.rows; ++y) {
                     //pixels.push_back(img.at<uchar>(x,y));
                     values = values + std::to_string((int)img.at<uchar>(x,y)) + ",";
                 }
             }
+            /*
+            std::cout << "HERE:  " <<  img.type() << std::endl;
+        Mat img2(cv::Size(IMAGE_WIDTH,IMAGE_HEIGHT), 0);
+        for(int x = 0; x < img2.rows; ++x) {
+            for(int y = 0; y < img2.cols; ++y) {
+                img2.at<uchar>(x,y) = pixels[x*100 + y];
+            }
+        }
+        showImage("TEST", img2);
+        waitKey();
+        return;
+        */
             values.pop_back();
+            //return;
             output << values << endl;
             //data.push_back(ImageData{(Classes)imgClass, pixels});
         }
     }
 
 }
+
+float sigmoid(float z) {
+    return (1.0 / (1.0 + exp(-z)));
+}
+
+
 //Kernal is an n by n sized vector of 1s or 0s
 //Mode is 0 for dialation, 1 for erosion
 Mat applyOperator(Mat &img, vector<vector<int> > &kernel, int mode) {
@@ -102,8 +165,8 @@ Mat applyOperator(Mat &img, vector<vector<int> > &kernel, int mode) {
             vector<uchar> pixels;
             for(int i = 0; i < kernel.size(); ++i) {
                 for(int j = 0; j < kernel.size(); ++j) {
-                    if(x + i - shift >= img.rows || y + j - shift >= img.cols) {
-                        pixels.push_back(0);
+                    if(x + i - shift >= img.rows || y + j - shift >= img.cols ||
+                       x + i - shift < 0 || y + j - shift < 0) {
                         continue;
                     }
                     if(kernel[i][j] == 1) {
