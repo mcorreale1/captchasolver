@@ -27,6 +27,13 @@ class Minimize {
 
         }
 
+        void runOneVsAll() {
+            
+            for(int i = 0; i < 10; ++i) {
+
+            }
+        }
+
         double sigmoid(double z){
             return 1.0 / (1.0 + exp(-z));
         }
