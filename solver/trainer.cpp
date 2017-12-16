@@ -53,9 +53,29 @@ int main(int argc, char **argv) {
     applyTraining(data);
 }
 
+
+/*void gradientDesnt( vector<ImageData> &data, double alpha, int iter, vector<float> &theta){
+    arma::delta;
+    int m = data.size();
+
+    for(int i = 0; i < iter; ++i){
+        delta = arma::trans(X)*
+    }
+}*/
+
 void applyTraining(vector<ImageData> &data) {
-    std::vector<std::vector<float> > theta(10, std::vector<float>(VECTOR_SIZE+1, 1));
-    cout << theta[0].size() << endl;
+    //std::vector<std::vector<float> > theta(10, std::vector<float>(VECTOR_SIZE+1, 1));
+
+    arma::mat theta = arma::zeros<arma::vec>(2);
+
+    arma::mat J = computeCost(data, theta);
+    cout << "J: " << J << endl;
+
+    int iter = 1500;
+    double alpha = 0.01;
+    //gradientDescent(data, alpha, iter, theta);
+
+    //cout << theta[0].size() << endl;
 }
 
 float multiply(vector<uchar> &v1, vector<float> &v2) {
