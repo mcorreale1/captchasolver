@@ -4,7 +4,7 @@ OPENCV= `pkg-config opencv --cflags --libs`
 all: trainer
 
 trainer: trainer.cpp
-	g++ -g -O0 -std=c++11 trainer.cpp  ${OPENCV} -o trainer
+	g++ -g -O0 -std=c++11 trainer.cpp  ${OPENCV} -o trainer -larmadillo
 
 .PHONY:clean
 

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <armadillo>
 
 using namespace std;
 using namespace cv;
@@ -18,6 +19,7 @@ using namespace cv;
 #define IMAGE_WIDTH  100
 #define IMAGE_HEIGHT  100
 #define VECTOR_SIZE  10000
+
 enum Classes {ZERO = 0, ONE = 1, TWO = 2, THREE = 3, FOUR = 4, 
                 FIVE = 5, SIX = 6, SEVEN = 7, EIGHT = 8, NINE = 9,
                 A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z};
@@ -25,6 +27,8 @@ struct ImageData {
     Classes c;
     std::vector<uchar> pixels;
 };
+
+
 
 Mat applyOperator(Mat &img, vector<vector<int> > &kernel, int mode);
 void generateData(string in, string out);
