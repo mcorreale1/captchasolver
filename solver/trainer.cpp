@@ -34,7 +34,6 @@ Mat applyOperator(Mat &img, vector<vector<int> > &kernel, int mode);
 void generateData(string in, string out);
 vector<ImageData> generateTraining(char* dataIn);
 Mat generateImage(string path);
-float sigmoid(float z);
 void showImage(string name, Mat& img);
 void applyTraining(vector<ImageData> &data);
 void updateThetas();
@@ -57,12 +56,14 @@ void applyTraining(vector<ImageData> &data) {
     std::vector<std::vector<float> > theta(10, std::vector<float>(VECTOR_SIZE, 0));
 
     Minimize mini(data, theta);
-    arma::mat J = mini.computeCost();
+    arma::mat J = mini.computeCost(0, 0);
     cout << "J: " << J << endl;
 
-    int iter = 1500;
+    int iter = 10;
     double alpha = 0.01;
-    mini.gradientDescent(alpha, iter);
+    mini.gradientDescent(alpha, iter, 0);
+    J = mini.computeCost(0,0);
+    cout << "J: " << J << endl;
     //gradientDescent(data, alpha, iter, theta);
 
     //cout << theta[0].size() << endl;
@@ -174,10 +175,6 @@ void generateData(string in, string out) {
         }
     }
 
-}
-
-float sigmoid(float z) {
-    return (1.0 / (1.0 + exp(-z)));
 }
 
 

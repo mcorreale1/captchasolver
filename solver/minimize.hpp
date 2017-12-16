@@ -26,19 +26,48 @@ class Minimize {
             }
 
         }
-        arma::mat computeCost(){
+
+        double sigmoid(double z){
+            return 1.0 / (1.0 + exp(-z));
+        }
+         
+        arma::rowvec sigmoid(arma::rowvec z){
+            for(int i=0; i<z.size(); i++){
+                z(i) = sigmoid(z(i));
+            }
+            return z;
+        }
+        /*
+        arma::colvec sigmoid(arma::colvec z){
+            arma::rowvec temp = z.t();
+            return (sigmoid(temp)).t();
+        }
+        */
+
+        arma::mat sig(int i) {
+            arma::mat z = 1.0 / ( 1 + arma::exp((X * theta.row(i).t()) * -1.0));
+            return z;
+        }
+
+        arma::mat computeCost(int i, int c) {
             arma::mat J;
-            J = arma::sum( (pow(((X * theta.row(0).t()) - y), 2)) / (2 * m) ) * lambda / (2 * m) * arma:::sum(pow(theta.row(0).t(), 2));
+            J = arma::sum(-y.row(i) * arma::log(sigmoid(X.row(i) * theta.row(i).t())) - (1.0 - y.row(i) * arma::log(1.0 - sigmoid(X.row(i) * theta.row(i).t())))) / m;
+            //J = J + (lambda / (2.0 * m)) * arma::sum(pow(theta.row(i).t(), 2));
+            //J = (arma::sum( ((pow(((X * theta.row(0).t()) - y), 2)) / (2 * m) )));
+            //cout << J << endl;
+            //J = J + (lambda / (2 * m) * sigmoid(arma::sum(pow(theta.row(0).t(), 2))));
             return J;
         }
 
-        void gradientDescent(double alpha, int num_iters) {
+        void gradientDescent(double alpha, int num_iters, int r) {
             arma::mat delta;
             for(int i = 0; i < num_iters; ++i) {
-                delta = arma::trans(X) * ((X *(theta.row(0)).t()) - y) / m;
-                theta.row(0) = arma::trans((theta.row(0).t() - alpha * delta));
+                //delta = (X.row(r).t() * (sigmoid(X.row(r) *(theta.row(r)).t()) - y.row(r))) / m;
+                delta = X.row(r).t() * (sigmoid(X.row(r) * theta.row(r).t()) - y.row(r)) / m + ((float)lambda / (float)m) * arma::sum(pow(theta.row(r).t(), 2));
+                theta.row(r) = (arma::trans((theta.row(r).t() - alpha * delta)));
             }
-            theta.row(0) = theta.row(0) + lambda / m * theta.row(0);
+            //theta.row(0) = theta.row(0) + (lambda / m * theta.row(0));
+            //cout <<  theta.row(0) << endl;
         }
 };
 
