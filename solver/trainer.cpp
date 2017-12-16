@@ -28,16 +28,22 @@ struct ImageData {
 
 Mat applyOperator(Mat &img, vector<vector<int> > &kernel, int mode);
 void generateData(string in, string out);
-void generateTraining(char* dataIn, char* out);
+vector<ImageData> generateTraining(char* dataIn, char* out);
 Mat generateImage(string path);
 float sigmoid(float z);
 void showImage(string name, Mat& img);
+void applyTraining(vector<ImageData> &data);
 int main(int argc, char **argv) {
     //generateData(argv[1], argv[2]);
     generateTraining(argv[1], argv[2]);
 }
 
-void generateTraining(char* dataIn, char* out) {
+void applyTraining(vector<ImageData> &data) {
+    std::vector<std::vector<int> > theta(10, std::vector<int>(1, VECTOR_SIZE));
+
+}
+
+vector<ImageData> generateTraining(char* dataIn, char* out) {
     ifstream input(dataIn);
     ifstream output(out);
     vector<ImageData> data;
@@ -64,14 +70,10 @@ void generateTraining(char* dataIn, char* out) {
                 img.at<uchar>(x,y) = (uchar)id.pixels[x*(IMAGE_WIDTH) + y];
             }
         }
-        showImage("TEST", img);
-        waitKey();
         sizeIndex++;
         data.push_back(id);
     }   
-
-
-        
+    return data; 
 }
 
 Mat generateImage(string path) {
