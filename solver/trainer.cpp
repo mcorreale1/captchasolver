@@ -28,24 +28,41 @@ struct ImageData {
 
 Mat applyOperator(Mat &img, vector<vector<int> > &kernel, int mode);
 void generateData(string in, string out);
-vector<ImageData> generateTraining(char* dataIn, char* out);
+vector<ImageData> generateTraining(char* dataIn);
 Mat generateImage(string path);
 float sigmoid(float z);
 void showImage(string name, Mat& img);
 void applyTraining(vector<ImageData> &data);
+void updateThetas();
+float lrCostFunction(ImageData &img, vector<float> thetas);
+
+
+float multiply(vector<uchar> &v1, vector<uchar> &v2);
+
 int main(int argc, char **argv) {
     //generateData(argv[1], argv[2]);
-    generateTraining(argv[1], argv[2]);
+    //generateTraining(argv[1], argv[2]);
+    
+    cout << "gathering training data" << endl;
+    auto data = generateTraining(argv[1]);
+    cout << "applying training" << endl;
+    applyTraining(data);
 }
 
 void applyTraining(vector<ImageData> &data) {
-    std::vector<std::vector<int> > theta(10, std::vector<int>(1, VECTOR_SIZE));
-
+    std::vector<std::vector<float> > theta(10, std::vector<float>(VECTOR_SIZE+1, 1));
+    cout << theta[0].size() << endl;
 }
 
-vector<ImageData> generateTraining(char* dataIn, char* out) {
+float multiply(vector<uchar> &v1, vector<float> &v2) {
+    float value = v2[0];
+    for(int i = 0; i < VECTOR_SIZE; ++i) {
+        value += v1[i] * v2[i + 1];
+    }
+    return value;
+}
+vector<ImageData> generateTraining(char* dataIn) {
     ifstream input(dataIn);
-    ifstream output(out);
     vector<ImageData> data;
     string line;
     int sizeIndex = 0;
@@ -64,13 +81,6 @@ vector<ImageData> generateTraining(char* dataIn, char* out) {
         while(ss >> delim >> v && delim == ',') {
             id.pixels.push_back((uchar) v);
         }
-        Mat img(cv::Size(IMAGE_WIDTH,IMAGE_HEIGHT), 0);
-        for(int x = 0; x < img.rows; ++x) {
-            for(int y = 0; y < img.cols; ++y) {
-                img.at<uchar>(x,y) = (uchar)id.pixels[x*(IMAGE_WIDTH) + y];
-            }
-        }
-        sizeIndex++;
         data.push_back(id);
     }   
     return data; 
