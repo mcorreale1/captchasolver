@@ -28,7 +28,7 @@ struct ImageData {
     std::vector<uchar> pixels;
 };
 
-
+#include "minimize.hpp"
 
 Mat applyOperator(Mat &img, vector<vector<int> > &kernel, int mode);
 void generateData(string in, string out);
@@ -39,8 +39,6 @@ void showImage(string name, Mat& img);
 void applyTraining(vector<ImageData> &data);
 void updateThetas();
 float lrCostFunction(ImageData &img, vector<float> thetas);
-
-
 float multiply(vector<uchar> &v1, vector<uchar> &v2);
 
 int main(int argc, char **argv) {
@@ -54,25 +52,17 @@ int main(int argc, char **argv) {
 }
 
 
-/*void gradientDesnt( vector<ImageData> &data, double alpha, int iter, vector<float> &theta){
-    arma::delta;
-    int m = data.size();
-
-    for(int i = 0; i < iter; ++i){
-        delta = arma::trans(X)*
-    }
-}*/
 
 void applyTraining(vector<ImageData> &data) {
-    //std::vector<std::vector<float> > theta(10, std::vector<float>(VECTOR_SIZE+1, 1));
+    std::vector<std::vector<float> > theta(10, std::vector<float>(VECTOR_SIZE, 0));
 
-    arma::mat theta = arma::zeros<arma::vec>(2);
-
-    arma::mat J = computeCost(data, theta);
+    Minimize mini(data, theta);
+    arma::mat J = mini.computeCost();
     cout << "J: " << J << endl;
 
     int iter = 1500;
     double alpha = 0.01;
+    mini.gradientDescent(alpha, iter);
     //gradientDescent(data, alpha, iter, theta);
 
     //cout << theta[0].size() << endl;

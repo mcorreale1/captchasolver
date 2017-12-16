@@ -1,13 +1,74 @@
 #ifndef MINIMIZE_H
 #define MINIMIZE_H
 
+class Minimize {
+    public:
+        arma::mat X;
+        arma::mat y;
+        arma::mat theta;
+        int m;
+        Minimize(vector<ImageData> &d, vector<vector<float> > &t) {
+            m = d.size();
+            X.resize(m, VECTOR_SIZE);
+            y.resize(m, 1);
+            theta.resize(10, VECTOR_SIZE);
+            for(int i = 0; i < d.size(); ++i) {
+                y.at(i, 0) = (int) d[i].c;
+                for(int k = 0; k < d[i].pixels.size(); ++k) {
+                    X.at(i,k) = d[i].pixels[k];
+                }
+            }
+            for(int i = 0; i < 10; ++i) {
+                for(int k = 0; k < VECTOR_SIZE; ++k) {
+                    theta.at(i, k) = t[i][k];
+                }
+            }
 
-mat computeCost(vector<vector <int>> X, vector<ImageData> y, const mat& theta){
-    mat J;
-    int m;
-    m = y.n_rows;
-    J = arma::arma::sum( (pow(((X * theta) - y), 2)) / (2 * m) );
+        }
+        arma::mat computeCost(){
+            arma::mat J;
+            J = arma::sum( (pow(((X * theta.row(0).t()) - y), 2)) / (2 * m) );
+            return J;
+        }
+
+        void gradientDescent(double alpha, int num_iters) {
+            arma::mat delta;
+            for(int i = 0; i < num_iters; ++i) {
+                delta = arma::trans(X) * ((X *(theta.row(0)).t()) - y) / m;
+                theta.row(0) = arma::trans((theta.row(0).t() - alpha * delta));
+            }
+        }
+};
+
+/*
+void gradientDesnt( vector<ImageData> &data, double alpha, int iter, vector<float> &theta){
+    arma::delta;
+    int m = data.size();
+
+    for(int i = 0; i < iter; ++i){
+        delta = arma::trans(X)*
+    }
+}
+*/
+
+arma::mat computeCost(vector<ImageData> &data, const arma::mat &theta){
+    arma::mat J;
+    int m = 1000;
+    m = data.size();
+    arma::mat X;
+    arma::mat y;
+
+    X.resize(m, VECTOR_SIZE);
+    y.resize(m, 1);
+    for(int i = 0; i < data.size(); ++i) {
+        y.at(i, 0) = (int) data[i].c;
+        for(int k = 0; k < data[i].pixels.size(); ++k) {
+            X.at(i,k) = data[i].pixels[k];
+        }
+    }
+    J = arma::sum( (pow(((X * theta) - y), 2)) / (2 * m) );
     return J;
 }
+
 
 #endif
