@@ -62,7 +62,7 @@ void applyTraining(vector<ImageData> &data) {
     int iter = 10;
     double alpha = 0.01;
     mini.gradientDescent(alpha, iter, 0);
-    J = mini.computeCost(0,0);
+    J = mini.computeCost(1,0);
     cout << "J: " << J << endl;
     //gradientDescent(data, alpha, iter, theta);
 
