@@ -3,6 +3,7 @@
 
 class Minimize {
     public:
+        int lambda = 3;
         arma::mat X;
         arma::mat y;
         arma::mat theta;
@@ -27,7 +28,7 @@ class Minimize {
         }
         arma::mat computeCost(){
             arma::mat J;
-            J = arma::sum( (pow(((X * theta.row(0).t()) - y), 2)) / (2 * m) );
+            J = arma::sum( (pow(((X * theta.row(0).t()) - y), 2)) / (2 * m) ) * lambda / (2 * m) * arma:::sum(pow(theta.row(0).t(), 2));
             return J;
         }
 
@@ -37,6 +38,7 @@ class Minimize {
                 delta = arma::trans(X) * ((X *(theta.row(0)).t()) - y) / m;
                 theta.row(0) = arma::trans((theta.row(0).t() - alpha * delta));
             }
+            theta.row(0) = theta.row(0) + lambda / m * theta.row(0);
         }
 };
 
@@ -51,7 +53,7 @@ void gradientDesnt( vector<ImageData> &data, double alpha, int iter, vector<floa
 }
 */
 
-arma::mat computeCost(vector<ImageData> &data, const arma::mat &theta){
+/*arma::mat computeCost(vector<ImageData> &data, const arma::mat &theta){
     arma::mat J;
     int m = 1000;
     m = data.size();
@@ -66,9 +68,9 @@ arma::mat computeCost(vector<ImageData> &data, const arma::mat &theta){
             X.at(i,k) = data[i].pixels[k];
         }
     }
-    J = arma::sum( (pow(((X * theta) - y), 2)) / (2 * m) );
+    J = arma::sum( (pow(((X * theta) - y), 2)) / (2 * m) ) * lambda / (2 * m) * arma:::sum(pow(theta, 2));
     return J;
-}
+}*/
 
 
 #endif
