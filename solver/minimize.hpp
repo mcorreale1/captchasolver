@@ -46,7 +46,7 @@ class Minimize {
                 cout << "ON CLASS " << c << endl;
                 for(int itr = 0; itr < num_iters; ++itr) {
                     arma::mat J = computeCost((c * 100), c);
-                    for(int r = (c * 100 + 1); r < ((c + 1) * 100); ++r) {
+                    for(int r = (c * 100) + 1; r < ((c + 1) * 100); ++r) {
                         J = computeCost(r, c);
                         gradientDescent(J, alpha, r, c );
                     }
