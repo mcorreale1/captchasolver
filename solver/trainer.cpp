@@ -65,7 +65,7 @@ void applyTraining(vector<ImageData> &data, vector<uchar> &image) {
     std::vector<std::vector<float> > theta(10, std::vector<float>(VECTOR_SIZE, 0));
 
     Minimize mini(data, theta);
-    int iter = 1;
+    int iter = 5;
     double alpha = 0.01;
     mini.runOneVsAll(alpha, iter, image);
     //gradientDescent(data, alpha, iter, theta);

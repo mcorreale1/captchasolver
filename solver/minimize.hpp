@@ -91,7 +91,7 @@ class Minimize {
             //delta = X.row(r).t() * ((X.row(r) * theta.row(c).t()) - y.row(r)) / m;
             //delta =   (X * theta.row(c).t() - y) / m;
             delta = arma::sum((sigmoid(X.row(i) * theta.row(c).t()) - Y) * X.row(i));
-            theta.row(c) = (theta.row(c) - (alpha * delta)) * J.at(0,0);
+            theta.row(c) = (theta.row(c) - (alpha * delta)) + J.at(0,0);
             for(int k = 0; k < VECTOR_SIZE; ++k) {
                 theta.at(c, k) = sigmoid(theta.at(c, k));
             }
