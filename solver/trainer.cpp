@@ -35,10 +35,8 @@ void generateData(string in, string out);
 vector<ImageData> generateTraining(char* dataIn);
 Mat generateImage(string path);
 void showImage(string name, Mat& img);
-void applyTraining(vector<ImageData> &data);
-void updateThetas();
-float lrCostFunction(ImageData &img, vector<float> thetas);
-float multiply(vector<uchar> &v1, vector<uchar> &v2);
+void applyTraining(vector<ImageData> &data, vector<uchar> &img);
+vector<uchar> flattenImage(char* file);
 
 int main(int argc, char **argv) {
     //generateData(argv[1], argv[2]);
@@ -47,23 +45,29 @@ int main(int argc, char **argv) {
     cout << "gathering training data" << endl;
     auto data = generateTraining(argv[1]);
     cout << "applying training" << endl;
-    applyTraining(data);
+    vector<uchar> image = flattenImage(argv[2]);
+    applyTraining(data, image);
+}
+
+vector<uchar> flattenImage(char* file) {
+    vector<uchar> pixels(VECTOR_SIZE, 0);
+    Mat img = generateImage(file);
+    for(int x = 0; x < img.rows; ++x) {
+        for(int y = 0; y < img.cols; ++y) {
+            pixels[x * img.rows + y] = img.at<uchar>(x,y);
+        }
+    }
+    return pixels;
 }
 
 
-
-void applyTraining(vector<ImageData> &data) {
+void applyTraining(vector<ImageData> &data, vector<uchar> &image) {
     std::vector<std::vector<float> > theta(10, std::vector<float>(VECTOR_SIZE, 0));
 
     Minimize mini(data, theta);
-    arma::mat J = mini.computeCost(0, 0);
-    cout << "J: " << J << endl;
-
-    int iter = 10;
+    int iter = 1;
     double alpha = 0.01;
-    mini.gradientDescent(alpha, iter, 0);
-    J = mini.computeCost(1,0);
-    cout << "J: " << J << endl;
+    mini.runOneVsAll(alpha, iter, image);
     //gradientDescent(data, alpha, iter, theta);
 
     //cout << theta[0].size() << endl;
@@ -156,22 +160,8 @@ void generateData(string in, string out) {
                     values = values + std::to_string((int)img.at<uchar>(x,y)) + ",";
                 }
             }
-            /*
-            std::cout << "HERE:  " <<  img.type() << std::endl;
-        Mat img2(cv::Size(IMAGE_WIDTH,IMAGE_HEIGHT), 0);
-        for(int x = 0; x < img2.rows; ++x) {
-            for(int y = 0; y < img2.cols; ++y) {
-                img2.at<uchar>(x,y) = pixels[x*100 + y];
-            }
-        }
-        showImage("TEST", img2);
-        waitKey();
-        return;
-        */
             values.pop_back();
-            //return;
             output << values << endl;
-            //data.push_back(ImageData{(Classes)imgClass, pixels});
         }
     }
 
